@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur Prix Verre - Demo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f5f7fa;}
+.container{background:white;border-radius:12px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.1);}
+h1{color:#2c3e50;text-align:center;margin-bottom:30px;font-size:28px;}
+.form-group{margin-bottom:20px;}
+label{display:block;font-weight:600;color:#34495e;margin-bottom:8px;}
+select,input{width:100%;padding:12px;border:2px solid #e1e8ed;border-radius:8px;font-size:16px;transition:border-color 0.3s;}
+select:focus,input:focus{outline:none;border-color:#3498db;}
+.dimensions{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+.btn-calcul{background:#3498db;color:white;padding:15px 30px;border:none;border-radius:8px;font-size:18px;font-weight:600;cursor:pointer;width:100%;transition:background 0.3s;}
+.btn-calcul:hover{background:#2980b9;}
+.result{margin-top:30px;padding:20px;background:#ecf0f1;border-radius:8px;display:none;}
+.price{font-size:2.5em;font-weight:800;color:#27ae60;text-align:center;margin:15px 0;}
+.btn-pdf{background:#e74c3c;color:white;padding:12px 24px;border:none;border-radius:6px;cursor:pointer;margin:15px auto;display:block;}
+.disclaimer{text-align:center;font-size:0.9em;color:#7f8c8d;margin-top:20px;}
+@media(max-width:600px){.dimensions{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🪟 Calculateur Prix Verre</h1>
+<p style="text-align:center;color:#7f8c8d;margin-bottom:30px;">Estimation instantanée - Devis PDF</p>
+
+<form id="calculForm">
+<div class="form-group">
+<label>Type de verre</label>
+<select id="typeVerre">
+<option value="float">Float simple (4mm) - 25€/m²</option>
+<option value="double">Double vitrage (4/16/4) - 65€/m²</option>
+<option value="triple">Triple vitrage - 95€/m²</option>
+<option value="securit">Sécurité feuilleté - 85€/m²</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Mode de pose</label>
+<select id="modePose">
+<option value="1">Pose en feuilleté - +15€/m²</option>
+<option value="0.8">Pose standard - +10€/m²</option>
+<option value="1.2">Pose intérieure extérieure - +25€/m²</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Dimensions (en cm)</label>
+<div class="dimensions">
+<div><input type="number" id="largeur" placeholder="Largeur" min="1" max="300" required></div>
+<div><input type="number" id="hauteur" placeholder="Hauteur" min="1" max="300" required></div>
+</div>
+</div>
+
+<button type="submit" class="btn-calcul">🧮 Calculer le prix</button>
+</form>
+
+<div id="result" class="result">
+<h3>📋 Votre estimation</h3>
+<div class="price" id="prixTotal">0 €</div>
+<p><strong>Surface:</strong> <span id="surface">0</span> m²</p>
+<p><strong>Prix verre:</strong> <span id="prixVerre">0</span> €</p>
+<p><strong>Pose:</strong> <span id="prixPose">0</span> €</p>
+<p><strong>Total HT:</strong> <span id="totalHT">0</span> €</p>
+<button class="btn-pdf" onclick="genererPDF()">📥 Télécharger Devis PDF</button>
+</div>
+
+<div class="disclaimer">*Estimation indicative. Devis personnalisé sur demande.</div>
+</div>
+
+<script>
+const PRIX_VERRE={float:25,double:65,triple:95,securit:85};
+document.getElementById('calculForm').addEventListener('submit',function(e){e.preventDefault();calculerPrix();});
+function calculerPrix(){
+const largeur=parseFloat(document.getElementById('largeur').value)/100;
+const hauteur=parseFloat(document.getElementById('hauteur').value)/100;
+const type=document.getElementById('typeVerre').value;
+const pose=parseFloat(document.getElementById('modePose').value);
+const surface=largeur*hauteur;
+const prixVerre=surface*PRIX_VERRE[type];
+const prixPose=surface*pose;
+const totalHT=prixVerre+prixPose;
+document.getElementById('surface').textContent=surface.toFixed(2);
+document.getElementById('prixVerre').textContent=prixVerre.toFixed(2)+' €';
+document.getElementById('prixPose').textContent=prixPose.toFixed(2)+' €';
+document.getElementById('totalHT').textContent=totalHT.toFixed(2)+' €';
+document.getElementById('prixTotal').textContent=totalHT.toLocaleString('fr-FR')+' €';
+document.getElementById('result').style.display='block';
+document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+function genererPDF(){
+const prix=document.getElementById('prixTotal').textContent;
+alert('📄 Devis PDF généré !\nTotal: '+prix+'\n\n(Fonction complète avec Django/WeasyPrint)');
+}
+</script>
+</body>
+</html>
